@@ -30,7 +30,7 @@ public class Scheduler extends AbstractScheduledService {
         tweets.forEach(tweet -> {
             List<Tweet> similar = searcher.findRelated(tweet);
             logger.info("Found " + similar.size() + " similar tweets");
-            replier.reply(tweet, similar);
+            if (similar.size() > 0) replier.reply(tweet, similar);
         });
     }
 
