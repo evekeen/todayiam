@@ -18,12 +18,17 @@ public class ReplierImpl implements Replier {
 
     @Override
     public void reply(Tweet original, List<Tweet> tweets) {
-        long userId = original.getUser().getId();
         String text = tweets.size() + " users are feeling the same today. http://vk.com/public76644009";
+        String message = getMentionString(original) + " " + text;
         try {
-            twitter.directMessageOperations().sendDirectMessage(userId, text);
-        } catch (Exception e) {
+            twitter.timelineOperations().updateStatus(message);
+        } catch (RuntimeException e) {
             e.printStackTrace();
+            throw (e);
         }
+    }
+
+    private String getMentionString(Tweet original) {
+        return "@" + original.getFromUser();
     }
 }
