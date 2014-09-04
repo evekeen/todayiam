@@ -25,7 +25,9 @@ public class Config {
     }
 
     @Bean public KeywordsAnalyzer keywordsAnalyzer() {
-        return new KeywordsAnalyzerImpl();
+        KeywordsAnalyzerImpl keywordsAnalyzer = new KeywordsAnalyzerImpl();
+        keywordsAnalyzer.setKeyWordNumber(2);
+        return keywordsAnalyzer;
     }
 
     @Bean Replier replier() {
