@@ -60,6 +60,7 @@ public class SearcherImpl implements Searcher {
 
     @Override public List<Tweet> findNew() {
         SearchParameters query = new SearchParameters("#todayiam #test").sinceId(lastScanned);
+        logger.info("query: " + query.getQuery());
         List<Tweet> tweets = twitter.searchOperations().search(query).getTweets();
         final SimpleDateFormat format = new SimpleDateFormat("MM.dd.yyyy");
         if (tweets.size() > 0) {
@@ -89,7 +90,7 @@ public class SearcherImpl implements Searcher {
         String keyWordsQuery = join(keyWords, " ");
         String since = " since:" + getSinceDate(tweet);
         String query = "#todayiam " + keyWordsQuery + since;
-        logger.debug("query: " + query);
+        logger.info("query: " + query);
         List<Tweet> related = twitter.searchOperations().search(query).getTweets();
         return FluentIterable.from(related).filter(t -> t.getFromUserId() != tweet.getFromUserId()).toImmutableList();
     }
