@@ -8,8 +8,6 @@ import java.util.List;
  * Author: Alexander Ivkin
  * Date: 04/09/14
  */
-public interface Searcher {
-    List<Tweet> findNew();
-
-    List<Tweet> findRelated(Tweet tweet);
+public interface KeywordsAnalyzer {
+    List<String> findKeyWords(Tweet tweet);
 }
