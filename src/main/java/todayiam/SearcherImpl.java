@@ -25,7 +25,6 @@ import static todayiam.utils.TweetUtils.getSinceDate;
  * Date: 02/09/14
  */
 public class SearcherImpl implements Searcher {
-    public static final int KEY_WORD_NUMBER = 3;
     private Twitter twitter;
     private long lastScanned;
     private String rootPath = System.getProperty("user.home") + File.separator + ".todayiam";

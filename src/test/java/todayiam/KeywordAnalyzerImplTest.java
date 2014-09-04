@@ -14,11 +14,13 @@ import static junit.framework.Assert.assertEquals;
  * Date: 04/09/14
  */
 public class KeywordAnalyzerImplTest {
-    private KeywordsAnalyzer keywordsAnalyzer;
+    private KeywordsAnalyzerImpl keywordsAnalyzer;
 
     @Before
     public void init() {
         keywordsAnalyzer = new KeywordsAnalyzerImpl();
+        keywordsAnalyzer.setKeyWordNumber(3);
+        keywordsAnalyzer.setMinLength(3);
     }
 
     @Test
@@ -38,5 +40,23 @@ public class KeywordAnalyzerImplTest {
         assertEquals(2, keyWords.size());
         assertEquals("feeling", keyWords.get(0));
         assertEquals("sad", keyWords.get(1));
+    }
+
+    @Test
+    public void symbols() {
+        Tweet tweet = new TweetBuilder("#todayiam #test feeling good!").build();
+        List<String> keyWords = keywordsAnalyzer.findKeyWords(tweet);
+        assertEquals(2, keyWords.size());
+        assertEquals("feeling", keyWords.get(0));
+        assertEquals("good", keyWords.get(1));
+    }
+
+    @Test
+    public void shortWord() {
+        Tweet tweet = new TweetBuilder("#todayiam #test wide awake at 09:30").build();
+        List<String> keyWords = keywordsAnalyzer.findKeyWords(tweet);
+        assertEquals(2, keyWords.size());
+        assertEquals("awake", keyWords.get(0));
+        assertEquals("wide", keyWords.get(1));
     }
 }
