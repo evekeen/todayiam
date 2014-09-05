@@ -52,11 +52,47 @@ public class KeywordAnalyzerImplTest {
     }
 
     @Test
-    public void shortWord() {
-        Tweet tweet = new TweetBuilder("#todayiam #test wide awake at 09:30").build();
+    public void ignoreShortWords() {
+        Tweet tweet = new TweetBuilder("#todayiam #test wide awake in UK").build();
         List<String> keyWords = keywordsAnalyzer.findKeyWords(tweet);
         assertEquals(2, keyWords.size());
         assertEquals("awake", keyWords.get(0));
         assertEquals("wide", keyWords.get(1));
+    }
+
+    @Test
+    public void ignoreShortWords2() {
+        Tweet tweet = new TweetBuilder("#todayiam #test wide awake at 09:30").build();
+        List<String> keyWords = keywordsAnalyzer.findKeyWords(tweet);
+        assertEquals(3, keyWords.size());
+        assertEquals("awake", keyWords.get(0));
+        assertEquals("09:30", keyWords.get(1));
+        assertEquals("wide", keyWords.get(2));
+    }
+
+    @Test
+    public void acceptTime() {
+        Tweet tweet = new TweetBuilder("#todayiam #test 09:30 awake").build();
+        List<String> keyWords = keywordsAnalyzer.findKeyWords(tweet);
+        assertEquals(2, keyWords.size());
+        assertEquals("09:30", keyWords.get(0));
+        assertEquals("awake", keyWords.get(1));
+    }
+
+    @Test
+    public void onlyTime() {
+        Tweet tweet = new TweetBuilder("#todayiam #test at 09:30").build();
+        List<String> keyWords = keywordsAnalyzer.findKeyWords(tweet);
+        assertEquals(1, keyWords.size());
+        assertEquals("09:30", keyWords.get(0));
+    }
+
+    @Test
+    public void fewShortWords() {
+        Tweet tweet = new TweetBuilder("#todayiam #test in UK").build();
+        List<String> keyWords = keywordsAnalyzer.findKeyWords(tweet);
+        assertEquals(2, keyWords.size());
+        assertEquals("in", keyWords.get(0));
+        assertEquals("UK", keyWords.get(1));
     }
 }

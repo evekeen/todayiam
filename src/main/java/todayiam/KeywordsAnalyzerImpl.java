@@ -27,12 +27,12 @@ public class KeywordsAnalyzerImpl implements KeywordsAnalyzer {
         words.removeIf(s -> s.toLowerCase().contains("#todayiam"));
         words.removeIf(s -> s.toLowerCase().contains("#test"));
         FluentIterable<String> fluent = FluentIterable.from(words).transform(w -> {
-            Pattern p = Pattern.compile("^(\\w+)");
+            Pattern p = Pattern.compile("(^.*)[!?.,]+$");
             Matcher matcher = p.matcher(w);
-            return matcher.find() ? matcher.group(1) : "";
+            return matcher.find() ? matcher.group(1) : w;
         });
-        fluent = fluent.filter(s -> s.length() >= minLength);
-        words = fluent.toList();
+        FluentIterable<String> lengthFiltered = fluent.filter(s -> s.length() >= minLength);
+        words = lengthFiltered.size() > 0 ? lengthFiltered.toList() : fluent.toList();
         int high = Math.min(words.size(), keyWordNumber);
         return words.subList(0, high);
     }
