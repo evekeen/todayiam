@@ -35,19 +35,19 @@ public class KeywordAnalyzerImplTest {
 
     @Test
     public void shortText() {
-        Tweet tweet = new TweetBuilder("#todayiam #test feeling sad").build();
+        Tweet tweet = new TweetBuilder("#todayiam #test maybe sad").build();
         List<String> keyWords = keywordsAnalyzer.findKeyWords(tweet);
         assertEquals(2, keyWords.size());
-        assertEquals("feeling", keyWords.get(0));
+        assertEquals("maybe", keyWords.get(0));
         assertEquals("sad", keyWords.get(1));
     }
 
     @Test
     public void symbols() {
-        Tweet tweet = new TweetBuilder("#todayiam #test feeling good!").build();
+        Tweet tweet = new TweetBuilder("#todayiam #test definitely good!").build();
         List<String> keyWords = keywordsAnalyzer.findKeyWords(tweet);
         assertEquals(2, keyWords.size());
-        assertEquals("feeling", keyWords.get(0));
+        assertEquals("definitely", keyWords.get(0));
         assertEquals("good", keyWords.get(1));
     }
 
@@ -94,5 +94,13 @@ public class KeywordAnalyzerImplTest {
         assertEquals(2, keyWords.size());
         assertEquals("in", keyWords.get(0));
         assertEquals("UK", keyWords.get(1));
+    }
+
+    @Test
+    public void knownWords() {
+        Tweet tweet = new TweetBuilder("#todayiam #test today i'm feeling sad").build();
+        List<String> keyWords = keywordsAnalyzer.findKeyWords(tweet);
+        assertEquals(1, keyWords.size());
+        assertEquals("sad", keyWords.get(0));
     }
 }
