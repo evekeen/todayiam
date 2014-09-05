@@ -47,6 +47,6 @@ public class Scheduler extends AbstractScheduledService {
 
     @Override
     protected void shutDown() {
-        logger.info("Shutdown scheduler...");
+        logger.warn("Shutdown scheduler...");
     }
 }
