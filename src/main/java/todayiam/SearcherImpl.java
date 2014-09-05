@@ -90,8 +90,8 @@ public class SearcherImpl implements Searcher {
         String keyWordsQuery = join(keyWords, " ");
         String since = " since:" + getSinceDate(tweet);
         String query = "#todayiam " + keyWordsQuery + since;
-        logger.info("query: " + query);
+        logger.debug("query: " + query);
         List<Tweet> related = twitter.searchOperations().search(query).getTweets();
-        return FluentIterable.from(related).filter(t -> t.getFromUserId() != tweet.getFromUserId()).toImmutableList();
+        return FluentIterable.from(related).filter(t -> t.getFromUserId() != tweet.getFromUserId()).toList();
     }
 }

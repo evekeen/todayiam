@@ -32,7 +32,7 @@ public class KeywordsAnalyzerImpl implements KeywordsAnalyzer {
             return matcher.find() ? matcher.group(1) : "";
         });
         fluent = fluent.filter(s -> s.length() >= minLength);
-        words = fluent.toImmutableList();
+        words = fluent.toList();
         int high = Math.min(words.size(), keyWordNumber);
         return words.subList(0, high);
     }
