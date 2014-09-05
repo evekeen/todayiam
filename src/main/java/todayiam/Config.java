@@ -1,9 +1,14 @@
 package todayiam;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.social.twitter.api.Twitter;
 import org.springframework.social.twitter.api.impl.TwitterTemplate;
+
+import java.io.FileNotFoundException;
 
 /**
  * Author: Alexander Ivkin
@@ -12,11 +17,20 @@ import org.springframework.social.twitter.api.impl.TwitterTemplate;
 @Configuration
 public class Config {
 
+    @Value("consumerKey") private String consumerKey;
+    @Value("consumerSecret") private String consumerSecret;
+    @Value("accessToken") private String accessToken;
+    @Value("accessTokenSecret") private String accessTokenSecret;
+
+    @Bean public static PropertyPlaceholderConfigurer propertyPlaceholderConfigurer() throws FileNotFoundException {
+        PropertyPlaceholderConfigurer propertyPlaceholderConfigurer = new PropertyPlaceholderConfigurer();
+        FileSystemResource location = new FileSystemResource("todayiam.properties");
+        if (!location.exists()) throw new FileNotFoundException("todayiam.properties not found in working directory: " + System.getProperty("user.dir"));
+        propertyPlaceholderConfigurer.setLocation(location);
+        return propertyPlaceholderConfigurer;
+    }
+
     @Bean public Twitter twitter() {
-        String consumerKey = "k4sT2zENvfAlqE4EY5LOz39uZ";
-        String consumerSecret = "9g2hoe56ee5RQFMGm3258h4HB5ZYicBLZClgJ8hlPEyBjsyZJ4";
-        String accessToken = "2788135837-Y9ItYg5MvOWc7bXASEeNgGmObvL1TYqcYFFqFDX";
-        String accessTokenSecret = "uxMj6EiN7S4bltzo9uSqvg2lK3MJ9MZecva8VsLdgEWUE";
         return new TwitterTemplate(consumerKey, consumerSecret, accessToken, accessTokenSecret);
     }
 
