@@ -1,4 +1,4 @@
-package todayiam;
+package todayiam.watchdog;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -7,6 +7,9 @@ import org.springframework.social.twitter.api.SearchResults;
 import org.springframework.social.twitter.api.Tweet;
 import org.springframework.social.twitter.api.Twitter;
 import todayiam.utils.TweetBuilder;
+import todayiam.watchdog.KeywordsAnalyzer;
+import todayiam.watchdog.Searcher;
+import todayiam.watchdog.SearcherImpl;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

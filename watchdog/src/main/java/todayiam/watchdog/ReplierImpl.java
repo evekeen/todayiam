@@ -1,4 +1,4 @@
-package todayiam;
+package todayiam.watchdog;
 
 import org.springframework.social.twitter.api.Tweet;
 import org.springframework.social.twitter.api.Twitter;

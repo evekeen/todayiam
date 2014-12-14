@@ -1,4 +1,4 @@
-package todayiam;
+package todayiam.watchdog;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -93,7 +93,7 @@ public class KeywordAnalyzerImplTest {
         List<String> keyWords = keywordsAnalyzer.findKeyWords(tweet);
         assertEquals(2, keyWords.size());
         assertEquals("in", keyWords.get(0));
-        assertEquals("UK", keyWords.get(1));
+        assertEquals("uk", keyWords.get(1));
     }
 
     @Test

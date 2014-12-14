@@ -1,5 +1,7 @@
-package todayiam;
+package todayiam.watchdog;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +43,7 @@ public class SearcherImpl implements Searcher {
         File root = new File(rootPath);
         String fileName = rootPath + File.separator + "lastid.txt";
         if (!root.exists() || !root.isDirectory()) {
-            root.mkdir();
+            if (!root.mkdir()) throw new RuntimeException("Cannot create working directory:" + root);
             File lastIdFile = new File(fileName);
             try {
                 boolean status = lastIdFile.createNewFile();
@@ -58,15 +60,21 @@ public class SearcherImpl implements Searcher {
         }
     }
 
+    @Override public Tweet getById(long id) {
+        return twitter.timelineOperations().getStatus(id);
+    }
+
     @Override public List<Tweet> findNew() {
-        SearchParameters query = new SearchParameters("#todayiam #test").sinceId(lastScanned);
+        SearchParameters query = new SearchParameters("#todayiam").sinceId(lastScanned);
         logger.debug("query: " + query.getQuery());
         List<Tweet> tweets = twitter.searchOperations().search(query).getTweets();
         final SimpleDateFormat format = new SimpleDateFormat("MM.dd.yyyy");
         if (tweets.size() > 0) {
-            FluentIterable<String> subjects = FluentIterable.from(tweets).transform(tweet -> {
-                lastScanned = Math.max(lastScanned, tweet.getId());
-                return format.format(tweet.getCreatedAt()) + ": " + tweet.getText();
+            FluentIterable<String> subjects = FluentIterable.from(tweets).transform(new Function<Tweet, String>() {
+                @Override public String apply(Tweet t) {
+                    lastScanned = Math.max(lastScanned, t.getId());
+                    return format.format(t.getCreatedAt()) + ": " + t.getText();
+                }
             });
             logger.debug(join(subjects, "\n"));
             saveLastId();
@@ -86,12 +94,16 @@ public class SearcherImpl implements Searcher {
         return findRelated(tweet, keywordsAnalyzer.findKeyWords(tweet));
     }
 
-    private List<Tweet> findRelated(Tweet tweet, List<String> keyWords) {
+    private List<Tweet> findRelated(final Tweet tweet, List<String> keyWords) {
         String keyWordsQuery = join(keyWords, " ");
         String since = " since:" + getSinceDate(tweet);
         String query = "#todayiam " + keyWordsQuery + since;
         logger.debug("query: " + query);
         List<Tweet> related = twitter.searchOperations().search(query).getTweets();
-        return FluentIterable.from(related).filter(t -> t.getFromUserId() != tweet.getFromUserId()).toList();
+        return FluentIterable.from(related).filter(new Predicate<Tweet>() {
+            @Override public boolean apply(Tweet t) {
+                return t.getFromUserId() != tweet.getFromUserId();
+            }
+        }).toList();
     }
 }

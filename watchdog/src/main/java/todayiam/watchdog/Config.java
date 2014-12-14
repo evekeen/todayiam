@@ -1,4 +1,4 @@
-package todayiam;
+package todayiam.watchdog;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
@@ -17,10 +17,10 @@ import java.io.FileNotFoundException;
 @Configuration
 public class Config {
 
-    @Value("consumerKey") private String consumerKey;
-    @Value("consumerSecret") private String consumerSecret;
-    @Value("accessToken") private String accessToken;
-    @Value("accessTokenSecret") private String accessTokenSecret;
+    @Value("${consumerKey}") private String consumerKey;
+    @Value("${consumerSecret}") private String consumerSecret;
+    @Value("${accessToken}") private String accessToken;
+    @Value("${accessTokenSecret}") private String accessTokenSecret;
 
     @Bean public static PropertyPlaceholderConfigurer propertyPlaceholderConfigurer() throws FileNotFoundException {
         PropertyPlaceholderConfigurer propertyPlaceholderConfigurer = new PropertyPlaceholderConfigurer();

@@ -1,8 +1,10 @@
 package todayiam.utils;
 
+import com.google.common.collect.Lists;
 import org.springframework.social.twitter.api.Tweet;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -21,5 +23,9 @@ public final class TweetUtils {
         Date oneDayBefore = cal.getTime();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         return format.format(oneDayBefore);
+    }
+
+    public static ArrayList<String> getWords(Tweet tweet) {
+        return Lists.newArrayList(tweet.getText().split("\\s+"));
     }
 }

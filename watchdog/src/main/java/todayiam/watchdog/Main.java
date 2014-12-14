@@ -1,4 +1,4 @@
-package todayiam;
+package todayiam.watchdog;
 
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Service;

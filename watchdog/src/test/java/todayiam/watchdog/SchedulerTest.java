@@ -1,4 +1,4 @@
-package todayiam;
+package todayiam.watchdog;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,8 +41,9 @@ public class SchedulerTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void noReplyWhenNotFound() throws Exception {
-        when(searcher.findRelated(orig)).thenReturn(Collections.emptyList());
+        when(searcher.findRelated(orig)).thenReturn(Collections.<Tweet>emptyList());
         scheduler.runOneIteration();
         verify(replier, never()).reply(any(Tweet.class), anyList());
     }

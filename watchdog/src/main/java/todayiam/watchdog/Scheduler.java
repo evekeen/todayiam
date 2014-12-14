@@ -1,4 +1,4 @@
-package todayiam;
+package todayiam.watchdog;
 
 import com.google.common.util.concurrent.AbstractScheduledService;
 import org.slf4j.Logger;
@@ -27,11 +27,11 @@ public class Scheduler extends AbstractScheduledService {
     protected void runOneIteration() throws Exception {
         logger.info("Searching for new tweets....");
         List<Tweet> tweets = searcher.findNew();
-        tweets.forEach(tweet -> {
+        for (Tweet tweet : tweets) {
             List<Tweet> similar = searcher.findRelated(tweet);
             logger.info("Found " + similar.size() + " similar tweets");
             if (similar.size() > 0) replier.reply(tweet, similar);
-        });
+        }
     }
 
     @Override
