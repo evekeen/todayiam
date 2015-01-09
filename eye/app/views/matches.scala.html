@@ -1,0 +1,23 @@
+@(original: Tweet, matches: Seq[Tweet])
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Today I Am: Matches</title>
+    </head>
+    <body>
+        <div>Original tweet was: @original.getText</div>
+        <div>
+        @if(matches.nonEmpty) {
+            Related tweets found:
+            <ul>
+            @for(p <- matches) {
+                <li><b>@p.getFromUser</b>: @p.getText</li>
+            }
+            </ul>
+        } else {
+            No related tweets have been found
+        }
+        </div>
+    </body>
+</html>
