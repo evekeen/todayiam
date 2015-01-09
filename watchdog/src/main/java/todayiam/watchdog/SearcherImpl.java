@@ -66,7 +66,6 @@ public class SearcherImpl implements Searcher {
 
     @Override public List<Tweet> findNew() {
         SearchParameters query = new SearchParameters("#todayiam").sinceId(lastScanned);
-        logger.debug("query: " + query.getQuery());
         List<Tweet> tweets = twitter.searchOperations().search(query).getTweets();
         final SimpleDateFormat format = new SimpleDateFormat("MM.dd.yyyy");
         if (tweets.size() > 0) {

@@ -25,7 +25,7 @@ public class Scheduler extends AbstractScheduledService {
 
     @Override
     protected void runOneIteration() throws Exception {
-        logger.info("Searching for new tweets....");
+        logger.debug("Searching for new tweets....");
         List<Tweet> tweets = searcher.findNew();
         for (Tweet tweet : tweets) {
             List<Tweet> similar = searcher.findRelated(tweet);
