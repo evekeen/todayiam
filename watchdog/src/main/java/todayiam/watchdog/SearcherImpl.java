@@ -93,6 +93,10 @@ public class SearcherImpl implements Searcher {
         return findRelated(tweet, keywordsAnalyzer.findKeyWords(tweet));
     }
 
+    @Override public List<Tweet> findRelated(Long id) {
+        return findRelated(getById(id));
+    }
+
     private List<Tweet> findRelated(final Tweet tweet, List<String> keyWords) {
         String keyWordsQuery = join(keyWords, " ");
         String since = " since:" + getSinceDate(tweet);

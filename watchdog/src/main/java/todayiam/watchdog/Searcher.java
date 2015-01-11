@@ -12,6 +12,7 @@ public interface Searcher {
     List<Tweet> findNew();
 
     List<Tweet> findRelated(Tweet tweet);
+    List<Tweet> findRelated(Long id);
 
     Tweet getById(long id);
 }

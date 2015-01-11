@@ -11,11 +11,13 @@ class EyeController(searcher: Searcher) extends Controller {
   }
 
   def matches(originalId: Long) = Action { implicit request =>
-    val original: Tweet = searcher.getById(originalId)
-    val related: Seq[Tweet] = request.queryString.getOrElse("id", None) match {
-      case ids: Seq[String] => ids.map({ case s: String => searcher.getById(s.toLong)})
-      case _ => scala.collection.JavaConversions.asScalaBuffer(searcher.findRelated(original)).toList
+    Ok(views.html.matches(searcher.getById(originalId), findRelated(originalId, request.queryString.getOrElse("id", None))))
+  }
+
+  def findRelated(originalId: Long, relatedIds: Any): Seq[Tweet] = {
+    relatedIds match {
+      case ids: Seq[Any] => ids.map({ case s: String => searcher.getById(s.toLong)})
+      case _ => scala.collection.JavaConversions.asScalaBuffer(searcher.findRelated(originalId)).toList
     }
-    Ok(views.html.matches(original, related))
   }
 }
