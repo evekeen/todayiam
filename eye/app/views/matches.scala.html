@@ -30,7 +30,7 @@
         <div>
         @if(matches.nonEmpty) {
             Related tweets found:
-            <ul class="nav nav-pills">
+            <ul class="nav nav-pills nav-stacked">
             @for(p <- matches) {
                 <li>
                     <a href="https://twitter.com/todayiamy/status/@p.getId">
