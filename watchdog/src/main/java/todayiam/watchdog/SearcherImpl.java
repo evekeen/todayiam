@@ -9,18 +9,16 @@ import org.springframework.social.twitter.api.SearchParameters;
 import org.springframework.social.twitter.api.Tweet;
 import org.springframework.social.twitter.api.Twitter;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
+import static com.google.common.base.Throwables.propagate;
+import static java.lang.Math.max;
 import static org.apache.commons.lang3.StringUtils.join;
 import static todayiam.utils.TweetUtils.getSinceDate;
+import static todayiam.utils.TweetUtils.prettyTweetSubject;
 
 /**
  * Author: Alexander Ivkin
@@ -28,7 +26,7 @@ import static todayiam.utils.TweetUtils.getSinceDate;
  */
 public class SearcherImpl implements Searcher {
     private Twitter twitter;
-    private long lastScanned;
+    private AtomicLong lastScanned = new AtomicLong();
     private String rootPath = System.getProperty("user.home") + File.separator + ".todayiam";
     private KeywordsAnalyzer keywordsAnalyzer;
     private static Logger logger = LoggerFactory.getLogger(SearcherImpl.class);
@@ -41,22 +39,30 @@ public class SearcherImpl implements Searcher {
 
     private void loadLastId() {
         File root = new File(rootPath);
-        String fileName = rootPath + File.separator + "lastid.txt";
+        String fileName = idFilePath();
         if (!root.exists() || !root.isDirectory()) {
-            if (!root.mkdir()) throw new RuntimeException("Cannot create working directory:" + root);
-            File lastIdFile = new File(fileName);
-            try {
-                boolean status = lastIdFile.createNewFile();
-                if (!status) throw new RuntimeException("Cannot create a last id file");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            createNewIdFile(root, fileName);
         } else {
-            try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-                lastScanned = Long.parseLong(reader.readLine());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            loadLastId(fileName);
+        }
+    }
+
+    private void loadLastId(String fileName) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            lastScanned.set(Long.parseLong(reader.readLine()));
+        } catch (IOException e) {
+            throw propagate(e);
+        }
+    }
+
+    private void createNewIdFile(File root, String fileName) {
+        if (!root.mkdir()) throw new RuntimeException("Cannot create working directory:" + root);
+        File lastIdFile = new File(fileName);
+        try {
+            boolean status = lastIdFile.createNewFile();
+            if (!status) throw new RuntimeException("Cannot create a last id file");
+        } catch (IOException e) {
+            throw propagate(e);
         }
     }
 
@@ -65,14 +71,14 @@ public class SearcherImpl implements Searcher {
     }
 
     @Override public List<Tweet> findNew() {
-        SearchParameters query = new SearchParameters("#todayiam").sinceId(lastScanned);
+        final long sinceId = lastScanned.get();
+        SearchParameters query = new SearchParameters("#todayiam").sinceId(sinceId);
         List<Tweet> tweets = twitter.searchOperations().search(query).getTweets();
-        final SimpleDateFormat format = new SimpleDateFormat("MM.dd.yyyy");
         if (tweets.size() > 0) {
-            FluentIterable<String> subjects = FluentIterable.from(tweets).transform(new Function<Tweet, String>() {
+            Iterable<String> subjects = FluentIterable.from(tweets).transform(new Function<Tweet, String>() {
                 @Override public String apply(Tweet t) {
-                    lastScanned = Math.max(lastScanned, t.getId());
-                    return format.format(t.getCreatedAt()) + ": " + t.getText();
+                    updateLastScanId(t, sinceId);
+                    return prettyTweetSubject(t);
                 }
             });
             logger.debug(join(subjects, "\n"));
@@ -81,12 +87,23 @@ public class SearcherImpl implements Searcher {
         return tweets;
     }
 
+    private void updateLastScanId(Tweet t, long sinceId) {
+        long curSinceId = sinceId;
+        while (!lastScanned.compareAndSet(curSinceId, max(curSinceId, t.getId()))) {
+            curSinceId = lastScanned.get();
+        }
+    }
+
     private void saveLastId() {
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(rootPath + File.separator + "lastid.txt")))) {
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(idFilePath())))) {
             writer.write(lastScanned + "");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw propagate(e);
         }
+    }
+
+    private String idFilePath() {
+        return rootPath + File.separator + "lastid.txt";
     }
 
     @Override public List<Tweet> findRelated(Tweet tweet) {
