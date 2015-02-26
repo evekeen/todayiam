@@ -7,6 +7,7 @@ import org.springframework.social.twitter.api.Twitter;
 
 import java.util.List;
 
+import static com.google.common.base.Throwables.propagate;
 import static com.google.common.collect.FluentIterable.from;
 
 /**
@@ -28,14 +29,17 @@ public class ReplierImpl implements Replier {
 
     @Override
     public void reply(Tweet original, List<Tweet> tweets) {
-        String text = tweets.size() + " users are feeling the same today. " + prepareUrl(original, tweets);
-        String message = getMentionString(original) + " " + text;
         try {
-            twitter.timelineOperations().updateStatus(message);
-        } catch (RuntimeException e) {
+            twitter.timelineOperations().updateStatus(buildReplyText(original, tweets));
+        } catch (Exception e) {
             e.printStackTrace();
-            throw e;
+            throw propagate(e);
         }
+    }
+
+    private String buildReplyText(Tweet original, List<Tweet> tweets) {
+        String text = tweets.size() + " users are feeling the same today. " + prepareUrl(original, tweets);
+        return getMentionString(original) + " " + text;
     }
 
     private String prepareUrl(Tweet original, List<Tweet> tweets) {

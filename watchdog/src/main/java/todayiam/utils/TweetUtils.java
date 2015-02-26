@@ -7,12 +7,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Author: Alexander Ivkin
  * Date: 04/09/14
  */
 public final class TweetUtils {
+    private static final SimpleDateFormat SUBJECT_FORMAT = new SimpleDateFormat("MM.dd.yyyy");
+
     private TweetUtils() {}
 
     public static String getSinceDate(Tweet tweet) {
@@ -25,7 +28,12 @@ public final class TweetUtils {
         return format.format(oneDayBefore);
     }
 
-    public static ArrayList<String> getWords(Tweet tweet) {
+    public static List<String> getWords(Tweet tweet) {
         return Lists.newArrayList(tweet.getText().split("\\s+"));
     }
+
+    public static String prettyTweetSubject(Tweet t) {
+        return SUBJECT_FORMAT.format(t.getCreatedAt()) + ": " + t.getText();
+    }
+
 }
